@@ -2,6 +2,8 @@
   server.js
 unix time is 1970 - less than 1970 + grater than 1970, every int is a second of time
 */
+
+const {ObjectID} = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -37,6 +39,23 @@ app.post('/todos', (req, res) =>{
   });
 });
 
+app.get('/todos/:id', (req,res) => {
+  //res.send(req.params);
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send('Invalid id');
+  }
+  Todo.findById(id).then((todo) =>{
+      if (!todo) {
+        return res.status(404).send('The todo was not found!');
+      }
+      res.status(200).send(JSON.stringify(todo, undefined, 2));
+  }, (e) => {
+    return res.status(400).send('Something went wrong');
+  })
+});
+
+
 app.get('/todos', (req,res) => {
   Todo.find().then((doc) => {
     res.send({doc});
@@ -44,6 +63,9 @@ app.get('/todos', (req,res) => {
     res.status(400).send(e)
   })
 });
+
+//Get a value from a query string
+
 
 
 app.listen(PORT, () =>{
