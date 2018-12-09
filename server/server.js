@@ -24,7 +24,10 @@ app.use(bodyParser.json());
 app.post('/todos', (req, res) =>{
   console.log(req.body);
   var todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    completed: req.body.completed
+  }, (e) => {
+    res.status(400).send(e);
   });
 
   todo.save().then((doc) =>{
@@ -34,7 +37,17 @@ app.post('/todos', (req, res) =>{
   });
 });
 
+app.get('/todos', (req,res) => {
+  Todo.find().then((doc) => {
+    res.send({doc});
+  }, (e) => {
+    res.status(400).send(e)
+  })
+})
+
 
 app.listen(PORT, () =>{
   console.log(`Server started on port ${PORT}`);
 });
+
+module.exports = {app};
