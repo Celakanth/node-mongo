@@ -13,7 +13,7 @@ var {Todo} = require('./models/todos');
 var {User} = require('./models/users');
 
 //Global setting
-var PORT = 3000;
+var port = process.env.PORT || 3000;
 
 //Server routing
 var app = express();
@@ -68,8 +68,8 @@ app.get('/todos', (req,res) => {
 
 
 
-app.listen(PORT, () =>{
-  console.log(`Server started on port ${PORT}`);
+app.listen(port, () =>{
+  console.log(`Server started on port ${port}`);
 });
 
 module.exports = {app};
