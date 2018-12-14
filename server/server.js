@@ -50,19 +50,30 @@ app.get('/todos/:id', (req,res) => {
         return res.status(404).send('The todo was not found!');
       }
       res.status(200).send(JSON.stringify(todo, undefined, 2));
-  }, (e) => {
-    return res.status(400).send('Something went wrong');
-  })
+  }).catch((e) => done(e));
 });
 
 
 app.get('/todos', (req,res) => {
   Todo.find().then((doc) => {
     res.send({doc});
-  }, (e) => {
-    res.status(400).send(e)
-  })
+  }).catch((e) => done(e));
 });
+
+//Delete Todo()
+app.delete('/todos/:id', (req,res) => {
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send('Invalid id');
+  };
+
+  Todo.findByIdAndRemove(id).then((doc) =>{
+    if (!doc ) {
+      return res.status(400).send('Todo could not be delted');
+    }
+    res.status(200).send(JSON.stringify(doc,undefined, 2));
+  }).catch((e) => done(e));
+})
 
 //Get a value from a query string
 
