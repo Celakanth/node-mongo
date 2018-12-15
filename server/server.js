@@ -3,7 +3,7 @@
 unix time is 1970 - less than 1970 + grater than 1970, every int is a second of time
 */
 
-require('./config.config.js');
+require('./config/config.js');
 
 const _ = require('lodash');
 const {ObjectID} = require('mongodb');
@@ -13,7 +13,7 @@ const bodyParser = require('body-parser');
 //Local imports
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
-const {User} = require('./models/users');
+const {Users} = require('./models/users');
 
 
 //Server routing
@@ -23,6 +23,7 @@ var app = express();
 
 app.use(bodyParser.json());
 
+//Todo routes
 //add a todo
 app.post('/todos', (req, res) =>{
   console.log(req.body);
@@ -101,14 +102,25 @@ app.patch('/todos/:id', (req,res) => {
 
 
 });
+//-----------------------End Todos routes--------------------------
 
+//User routes
 
-//Update a tedo
+app.post('/user', (req,res) => {
+  var user = new Users({
+    email: req.body.email,
+    password: req.body.password,
+    active: true
+  });
 
+  user.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e);
+  })
+});
 
-//Get a value from a query string
-
-
+//-----------------------End User routes-------------------------
 
 app.listen(process.env.PORT, () =>{
   console.log(`Server started on port ${process.env.PORT}`);
