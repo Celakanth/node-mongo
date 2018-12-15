@@ -2,6 +2,9 @@
   server.js
 unix time is 1970 - less than 1970 + grater than 1970, every int is a second of time
 */
+
+require('./config.config.js');
+
 const _ = require('lodash');
 const {ObjectID} = require('mongodb');
 const express = require('express');
@@ -12,8 +15,6 @@ const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
 const {User} = require('./models/users');
 
-//Global setting
-var port = process.env.PORT || 3000;
 
 //Server routing
 var app = express();
@@ -109,8 +110,8 @@ app.patch('/todos/:id', (req,res) => {
 
 
 
-app.listen(port, () =>{
-  console.log(`Server started on port ${port}`);
+app.listen(process.env.PORT, () =>{
+  console.log(`Server started on port ${process.env.PORT}`);
 });
 
 module.exports = {app};
