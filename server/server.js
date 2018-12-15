@@ -2,15 +2,15 @@
   server.js
 unix time is 1970 - less than 1970 + grater than 1970, every int is a second of time
 */
-
+const _ = require('lodash');
 const {ObjectID} = require('mongodb');
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 //Local imports
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todos');
-var {User} = require('./models/users');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todos');
+const {User} = require('./models/users');
 
 //Global setting
 var port = process.env.PORT || 3000;
@@ -73,7 +73,37 @@ app.delete('/todos/:id', (req,res) => {
     }
     res.status(200).send(JSON.stringify(doc,undefined, 2));
   }).catch((e) => done(e));
-})
+});
+
+app.patch('/todos/:id', (req,res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send('Invalid id');
+  };
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((doc) => {
+    if (!doc) {
+      return res.status(404).send('The id not found');
+    }
+    res.status(200).send(doc)})
+    .catch((e) => {
+      res.status(400).send(e);
+  });
+
+
+});
+
+
+//Update a tedo
+
 
 //Get a value from a query string
 
