@@ -15,6 +15,8 @@ const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
 const {Users} = require('./models/users');
 
+const {authenticate} = require('./middleware/authenticate')
+
 
 //Server routing
 var app = express();
@@ -99,14 +101,22 @@ app.patch('/todos/:id', (req,res) => {
     .catch((e) => {
       res.status(400).send(e);
   });
-
-
 });
+
+
+
 
 //-----------------------End Todos routes--------------------------
 
 //User routes
 
+//Authenticate a user
+app.get('/user/me', authenticate, (req,res) => {
+    res.send(req.user);
+});
+
+
+//Create Users
 app.post('/user', (req,res) => {
   //var body = _.pick(req.body, ['email', 'password'])
   var user = new Users({
@@ -135,6 +145,8 @@ app.get('/users/:email', (req,res) => {
       res.status(200).send(JSON.stringify(user, undefined, 2));
   }).catch((e) => done(e));
 });
+
+
 
 
 
