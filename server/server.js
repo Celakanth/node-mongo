@@ -10,6 +10,7 @@ const {ObjectID} = require('mongodb');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+
 //Local imports
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
@@ -110,6 +111,8 @@ app.patch('/todos/:id', (req,res) => {
 
 //User routes
 
+
+
 //Authenticate a user
 app.get('/user/me', authenticate, (req,res) => {
     res.send(req.user);
@@ -127,7 +130,6 @@ app.post('/user', (req,res) => {
   user.save().then(() => {
     return user.gerenateAuthToken()
   }).then((token) => {
-    console.log(token);
     res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
@@ -151,6 +153,7 @@ app.get('/users/:email', (req,res) => {
 
 
 //-----------------------End User routes-------------------------
+
 
 app.listen(process.env.PORT, () =>{
   console.log(`Server started on port ${process.env.PORT}`);
