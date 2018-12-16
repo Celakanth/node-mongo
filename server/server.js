@@ -27,8 +27,10 @@ var app = express();
 app.use(bodyParser.json());
 
 //Todo routes
+
+
 //add a todo
-app.post('/todos', (req, res) =>{
+app.post('/todos', authenticate, (req, res) =>{
   console.log(req.body);
   var todo = new Todo({
     text: req.body.text,
@@ -44,7 +46,8 @@ app.post('/todos', (req, res) =>{
   });
 });
 
-app.get('/todos/:id', (req,res) => {
+// Get Todo by ID
+app.get('/todos/:id', authenticate, (req,res) => {
   //res.send(req.params);
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
@@ -58,29 +61,31 @@ app.get('/todos/:id', (req,res) => {
   }).catch((e) => done(e));
 });
 
-
-app.get('/todos', (req,res) => {
-  Todo.find().then((doc) => {
-    res.send({doc});
+//Get all Todos
+app.get('/todos', authenticate, (req,res) => {
+  Todo.find().then((todos) => {
+    res.send({todos});
   }).catch((e) => done(e));
 });
 
 //Delete Todo()
-app.delete('/todos/:id', (req,res) => {
+app.delete('/todos/:id', authenticate, (req,res) => {
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send('Invalid id');
   };
 
-  Todo.findByIdAndRemove(id).then((doc) =>{
-    if (!doc ) {
+  Todo.findByIdAndRemove(id).then((todo) =>{
+    if (!todo ) {
       return res.status(400).send('Todo could not be delted');
     }
-    res.status(200).send(JSON.stringify(doc,undefined, 2));
+    res.status(200).send({todo});
   }).catch((e) => done(e));
 });
 
-app.patch('/todos/:id', (req,res) => {
+
+// Update a Todo
+app.patch('/todos/:id', authenticate, (req,res) => {
   var id = req.params.id;
   var body = _.pick(req.body, ['text', 'completed']);
 
@@ -94,18 +99,15 @@ app.patch('/todos/:id', (req,res) => {
     body.completed = false;
     body.completedAt = null;
   }
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((doc) => {
-    if (!doc) {
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo) {
       return res.status(404).send('The id not found');
     }
-    res.status(200).send(doc)})
-    .catch((e) => {
+    res.status(200).send({todo})
+  }).catch((e) => {
       res.status(400).send(e);
   });
 });
-
-
-
 
 //-----------------------End Todos routes--------------------------
 
@@ -137,16 +139,7 @@ app.post('/user', (req,res) => {
 });
 
 //Get a user by email
-app.get('/users/:email', (req,res) => {
-  //res.send(req.params);
-  var email = req.params.email;
-  Todo.find({email}).then((user) =>{
-      if (!user) {
-        return res.status(404).send('The user was not found!');
-      }
-      res.status(200).send(JSON.stringify(user, undefined, 2));
-  }).catch((e) => done(e));
-});
+
 
 
 
