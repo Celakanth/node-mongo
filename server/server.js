@@ -102,23 +102,41 @@ app.patch('/todos/:id', (req,res) => {
 
 
 });
+
 //-----------------------End Todos routes--------------------------
 
 //User routes
 
 app.post('/user', (req,res) => {
+  //var body = _.pick(req.body, ['email', 'password'])
   var user = new Users({
     email: req.body.email,
     password: req.body.password,
     active: true
   });
-
-  user.save().then((doc) => {
-    res.send(doc);
+  user.save().then(() => {
+    return user.gerenateAuthToken()
+  }).then((token) => {
+    console.log(token);
+    res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
   })
 });
+
+//Get a user by email
+app.get('/users/:email', (req,res) => {
+  //res.send(req.params);
+  var email = req.params.email;
+  Todo.find({email}).then((user) =>{
+      if (!user) {
+        return res.status(404).send('The user was not found!');
+      }
+      res.status(200).send(JSON.stringify(user, undefined, 2));
+  }).catch((e) => done(e));
+});
+
+
 
 //-----------------------End User routes-------------------------
 
