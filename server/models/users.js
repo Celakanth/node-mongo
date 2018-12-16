@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
 
+var {salt} = require('./../config/salt');
+
 
 var UserSchema = new mongoose.Schema({
   email: {
@@ -61,7 +63,7 @@ UserSchema.methods.toJSON = function (){
 UserSchema.methods.gerenateAuthToken = function (){
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'celakanth').toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access}, salt).toString();
   user.tokens = user.tokens.concat([{access,token}]);
   return user.save().then(() => {
     return token;
@@ -73,7 +75,7 @@ UserSchema.statics.findByToken = function(token){
   var decode;
 
   try {
-    decode = jwt.verify(token, 'celakanth');
+    decode = jwt.verify(token, salt);
 
   } catch (e) {
       return Promise.reject();
