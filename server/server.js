@@ -115,7 +115,7 @@ app.post('/user', (req,res) => {
 
   user.save().then((doc) => {
     res.send(doc);
-  }, (e) => {
+  }).catch((e) => {
     res.status(400).send(e);
   })
 });
