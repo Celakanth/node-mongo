@@ -133,6 +133,16 @@ app.post('/users/login', (req,res) => {
     });
 });
 
+//Log a user routes
+
+app.delete('/user/me/token',authenticate, (req,res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }).catch(() =>{
+     res.this.status(400).send();
+  });
+});
+
 //Create Users
 app.post('/user', (req,res) => {
   //var body = _.pick(req.body, ['email', 'password'])
