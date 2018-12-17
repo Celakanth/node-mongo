@@ -120,6 +120,18 @@ app.get('/user/me', authenticate, (req,res) => {
     res.send(req.user);
 });
 
+//User login
+app.post('/users/login', (req,res) => {
+    var body = _.pick(req.body, ['email', 'password'])
+    Users.findByCredentials(body.email, body.password).then((user) => {
+      //res.header('x-auth',user.tokens[0].token).send(user);
+      return user.gerenateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user);
+      });
+    }).catch((e) =>{
+      res.status(400).send();
+    });
+});
 
 //Create Users
 app.post('/user', (req,res) => {
