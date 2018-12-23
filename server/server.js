@@ -34,7 +34,8 @@ app.post('/todos', authenticate, (req, res) =>{
   console.log(req.body);
   var todo = new Todo({
     text: req.body.text,
-    completed: req.body.completed
+    completed: req.body.completed,
+    _userCreator: req.user._id
   }, (e) => {
     res.status(400).send(e);
   });
@@ -53,7 +54,10 @@ app.get('/todos/:id', authenticate, (req,res) => {
   if (!ObjectID.isValid(id)) {
     return res.status(404).send('Invalid id');
   }
-  Todo.findById(id).then((todo) =>{
+  Todo.findById({
+    _id:id,
+    _userCreator: req.user._id
+  }).then((todo) =>{
       if (!todo) {
         return res.status(404).send('The todo was not found!');
       }
@@ -63,7 +67,9 @@ app.get('/todos/:id', authenticate, (req,res) => {
 
 //Get all Todos
 app.get('/todos', authenticate, (req,res) => {
-  Todo.find().then((todos) => {
+  Todo.find({
+    _userCreator: req.user._id
+  }).then((todos) => {
     res.send({todos});
   }).catch((e) => done(e));
 });
@@ -75,7 +81,10 @@ app.delete('/todos/:id', authenticate, (req,res) => {
     return res.status(404).send('Invalid id');
   };
 
-  Todo.findByIdAndRemove(id).then((todo) =>{
+  Todo.findByIdAndRemove({
+    _id:id,
+    _userCreator: req.user._id
+  }).then((todo) =>{
     if (!todo ) {
       return res.status(400).send('Todo could not be delted');
     }
@@ -99,7 +108,12 @@ app.patch('/todos/:id', authenticate, (req,res) => {
     body.completed = false;
     body.completedAt = null;
   }
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+  Todo.findByIdAndUpdate({
+    _id:id,
+    _userCreator: req.user._id
+  },
+  {$set: body},
+  {new: true}).then((todo) => {
     if (!todo) {
       return res.status(404).send('The id not found');
     }
