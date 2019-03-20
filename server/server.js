@@ -9,12 +9,14 @@ const _ = require('lodash');
 const {ObjectID} = require('mongodb');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors =require('cors');
 
 
 //Local imports
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
 const {Users} = require('./models/users');
+
 
 const {authenticate} = require('./middleware/authenticate')
 
@@ -25,6 +27,7 @@ var app = express();
 //Adding in body parser as middleware to express()
 
 app.use(bodyParser.json());
+app.use(cors);
 
 //Todo routes
 
